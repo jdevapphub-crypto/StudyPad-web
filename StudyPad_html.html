@@ -1,0 +1,3376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>StudyPad</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            overflow: hidden;
+        }
+
+        /* =========================
+           FIXED HEADER
+        ========================== */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 15px;
+
+            z-index: 1000;
+
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0px;
+            font-weight: 700;
+            color: #111827;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .logo-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111827;
+            color: white;
+            font-size: 18px;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            font-weight: 400;
+            color: #6b7280;
+            opacity: 0.4;
+            margin-left: 46px;
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search {
+            width: 140px;
+            height: 36px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0 12px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .search:focus {
+            border-color: #111827;
+        }
+
+        .notification {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: #f3f4f6;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #111827;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: #f3f4f6;
+            cursor: pointer;
+            font-size: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 240px;
+            height: calc(100vh - 60px);
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 16px 12px;
+            overflow-y: auto;
+            z-index: 900;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 850;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .menu-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin: 8px 10px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .menu-item.active {
+            background: #111827;
+            color: white;
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================== */
+
+        .main {
+            position: fixed;
+            top: 60px;
+            left: 240px;
+            width: calc(100% - 240px);
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            padding: 20px;
+            transition: left 0.3s ease, width 0.3s ease;
+        }
+
+        .main.expanded {
+            left: 0;
+            width: 100%;
+        }
+
+        .page-title {
+            margin-bottom: 20px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           DASHBOARD CARDS
+        ========================== */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .card-label {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+
+        /* =========================
+           CONTENT GRID
+        ========================== */
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+
+        /* =========================
+           DEADLINES
+        ========================== */
+
+        .section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            font-size: 16px;
+            color: #111827;
+        }
+
+        .deadline {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .deadline:last-child {
+            margin-bottom: 0;
+        }
+
+        .deadline-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .countdown {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .progress {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 80%;
+            background: #111827;
+        }
+
+
+        /* =========================
+           STICKY NOTES
+        ========================== */
+
+        .sticky-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .sticky {
+            min-height: 110px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #fff8b5;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            cursor: grab;
+            transition: box-shadow 0.2s, transform 0.1s;
+            user-select: none;
+            position: relative;
+        }
+
+        .sticky:active {
+            cursor: grabbing;
+        }
+
+        .sticky.dragging {
+            opacity: 0.85;
+            transform: scale(0.98);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            z-index: 9999 !important;
+        }
+
+        .sticky h3 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            outline: none;
+        }
+
+        .sticky h3:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .sticky p {
+            font-size: 12px;
+            line-height: 1.5;
+            cursor: pointer;
+            padding: 3px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            outline: none;
+        }
+
+        .sticky p:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .sticky .delete-sticky {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            opacity: 0.6;
+        }
+
+        .sticky .delete-sticky:hover {
+            background: rgba(220, 38, 38, 0.2);
+            opacity: 1;
+        }
+
+        /* button styles */
+        .btn-action {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #111827;
+            font-weight: 500;
+        }
+        .btn-action:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+        .btn-add-sticky {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #111827;
+        }
+        .btn-add-sticky:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        /* =========================
+           PAGE SECTIONS (hidden by default)
+        ========================== */
+        .page-section {
+            display: none;
+        }
+        .page-section.active-section {
+            display: block;
+        }
+
+        /* =========================
+           NOTES & UPLOAD
+        ========================== */
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .note-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .note-item .note-title {
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+        }
+        .note-item .note-meta {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .note-item .note-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 6px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        .note-item .note-actions button:hover {
+            color: #111827;
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            margin-top: 12px;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .upload-area:hover {
+            border-color: #111827;
+            background: #f9fafb;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-area.dragover {
+            border-color: #111827;
+            background: #f3f4f6;
+        }
+
+        /* =========================
+           CALENDAR
+        ========================== */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 12px;
+        }
+        .calendar-grid .day {
+            padding: 8px;
+            text-align: center;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 13px;
+        }
+        .calendar-grid .day.weekday {
+            font-weight: bold;
+            color: #6b7280;
+            background: transparent;
+            font-size: 11px;
+        }
+        .calendar-grid .day.today {
+            background: #111827;
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-grid .day.other-month {
+            color: #9ca3af;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .calendar-header button {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .calendar-header button:hover {
+            background: #e5e7eb;
+        }
+        .calendar-header h2 {
+            font-size: 16px;
+        }
+
+        /* =========================
+           STUDY TIMER
+        ========================== */
+        .timer-display {
+            font-size: 40px;
+            font-weight: bold;
+            text-align: center;
+            padding: 16px;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+        .timer-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .timer-controls button {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .timer-controls .start-btn {
+            background: #111827;
+            color: white;
+        }
+        .timer-controls .start-btn:hover {
+            background: #374151;
+        }
+        .timer-controls .pause-btn {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .timer-controls .pause-btn:hover {
+            background: #e5e7eb;
+        }
+        .timer-controls .reset-btn {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .timer-controls .reset-btn:hover {
+            background: #e5e7eb;
+        }
+        .timer-status {
+            text-align: center;
+            margin-top: 8px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .timer-alert {
+            display: none;
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+            color: #dc2626;
+            font-weight: bold;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* =========================
+           ASSESSMENT FORM
+        ========================== */
+        .assessment-form {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .assessment-form input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .assessment-form input:focus {
+            outline: none;
+            border-color: #111827;
+        }
+        .assessment-form .form-row {
+            display: flex;
+            gap: 8px;
+        }
+        .assessment-form .form-row input {
+            flex: 1;
+        }
+        .assessment-form .form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .assessment-form .form-actions button {
+            flex: 1;
+        }
+
+        /* =========================
+           ASSIGNMENTS PORTAL
+        ========================== */
+        .assignment-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #fafbfc;
+        }
+        .assignment-card .assignment-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #111827;
+        }
+        .assignment-card .assignment-desc {
+            font-size: 13px;
+            color: #4b5563;
+            margin: 6px 0;
+        }
+        .assignment-card .assignment-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .assignment-card .assignment-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+        .assignment-card .assignment-actions button {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .assignment-form {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .assignment-form input,
+        .assignment-form textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .assignment-form textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .assignment-form input:focus,
+        .assignment-form textarea:focus {
+            outline: none;
+            border-color: #111827;
+        }
+        .assignment-form .form-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* =========================
+           DOCUMENTS SECTION
+        ========================== */
+        .doc-item {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .doc-item .doc-info {
+            flex: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .doc-item .doc-info:hover .doc-name {
+            color: #2563eb;
+        }
+        .doc-item .doc-name {
+            font-weight: 500;
+            color: #111827;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .doc-item .doc-meta {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .doc-item .doc-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .doc-item .doc-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .doc-item .doc-actions button:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .doc-item .doc-actions .view-btn:hover {
+            color: #2563eb;
+        }
+        .doc-item .doc-actions .delete-btn:hover {
+            color: #dc2626;
+            background: #fee2e2;
+        }
+        .doc-icon {
+            font-size: 20px;
+        }
+
+        /* Document Viewer Modal */
+        .doc-viewer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .doc-viewer-overlay.active {
+            display: flex;
+        }
+        .doc-viewer {
+            background: white;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .doc-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .doc-viewer-header h3 {
+            font-size: 16px;
+            color: #111827;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .doc-viewer-header .close-viewer {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0 8px;
+        }
+        .doc-viewer-header .close-viewer:hover {
+            color: #111827;
+        }
+        .doc-viewer-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .doc-viewer-body .doc-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            min-height: 200px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .doc-viewer-body .doc-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .doc-viewer-body .doc-content .file-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+        .doc-viewer-body .doc-content .file-type-badge .ext {
+            font-weight: bold;
+            color: #111827;
+            text-transform: uppercase;
+        }
+        .doc-viewer-body .doc-content .preview-unavailable {
+            color: #6b7280;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        /* =========================
+           TIMETABLE
+        ========================== */
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .timetable-grid .time-slot {
+            font-weight: 600;
+            font-size: 13px;
+            color: #6b7280;
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .timetable-grid .event-slot {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+        .timetable-grid .event-slot .event-name {
+            font-weight: 500;
+            color: #111827;
+        }
+        .timetable-grid .event-slot .event-desc {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .timetable-grid .event-slot .event-desc button {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        /* =========================
+           GRADES
+        ========================== */
+        .grade-subject {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            background: #fafbfc;
+        }
+        .grade-subject .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .grade-subject .subject-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #111827;
+        }
+        .grade-subject .subject-final {
+            font-weight: bold;
+            font-size: 18px;
+            color: #059669;
+        }
+        .grade-subject .subject-final.fail {
+            color: #dc2626;
+        }
+        .grade-subject .assessment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .grade-subject .assessment-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .grade-subject .assessment-item label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        .grade-subject .assessment-item input {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+        }
+        .grade-subject .assessment-item input:focus {
+            border-color: #111827;
+        }
+        .grade-subject .assessment-item input::placeholder {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+        .grade-subject .subject-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        .grade-subject .subject-actions button {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* =========================
+           SETTINGS
+        ========================== */
+        .setting-group {
+            margin-bottom: 16px;
+        }
+        .setting-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        .setting-group input,
+        .setting-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        .setting-group input:focus,
+        .setting-group select:focus {
+            outline: none;
+            border-color: #111827;
+        }
+        .setting-group .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .setting-group .checkbox-group input {
+            width: auto;
+        }
+
+        /* =========================
+           MOBILE RESPONSIVE
+        ========================== */
+
+        @media (max-width: 1024px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .search {
+                display: none;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main {
+                left: 0;
+                width: 100%;
+                padding: 15px;
+                height: calc(100vh - 60px);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            .card-value {
+                font-size: 20px;
+            }
+
+            .sticky-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .section {
+                padding: 14px;
+            }
+
+            .page-title h1 {
+                font-size: 20px;
+            }
+
+            .header {
+                padding: 0 12px;
+                height: 56px;
+            }
+
+            .logo-main {
+                font-size: 17px;
+            }
+
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .logo-sub {
+                font-size: 10px;
+                margin-left: 42px;
+            }
+
+            .profile {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .notification {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .countdown {
+                font-size: 16px;
+            }
+
+            .deadline-title {
+                font-size: 13px;
+            }
+
+            .timer-display {
+                font-size: 32px;
+            }
+
+            .grade-subject .assessment-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .doc-viewer {
+                max-width: 95%;
+                max-height: 95%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cards {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .card {
+                padding: 10px;
+            }
+
+            .card-value {
+                font-size: 18px;
+            }
+
+            .card-label {
+                font-size: 11px;
+            }
+
+            .sticky-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 12px;
+            }
+
+            .section-header h2 {
+                font-size: 14px;
+            }
+
+            .page-title h1 {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                width: 260px;
+            }
+
+            .menu-item {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            .timer-display {
+                font-size: 28px;
+            }
+
+            .timer-controls button {
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+
+            .calendar-grid .day {
+                padding: 5px;
+                font-size: 11px;
+            }
+
+            .timetable-grid {
+                grid-template-columns: 60px 1fr;
+            }
+
+            .grade-subject .assessment-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .doc-viewer {
+                max-width: 98%;
+                max-height: 98%;
+            }
+            .doc-viewer-header h3 {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .cards {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .card {
+                padding: 8px;
+            }
+
+            .card-value {
+                font-size: 16px;
+            }
+
+            .logo-main {
+                font-size: 14px;
+            }
+
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+
+            .logo-sub {
+                font-size: 9px;
+                margin-left: 38px;
+            }
+
+            .header {
+                padding: 0 8px;
+                height: 50px;
+            }
+
+            .main {
+                top: 50px;
+                height: calc(100vh - 50px);
+                padding: 8px;
+            }
+
+            .sidebar {
+                top: 50px;
+                height: calc(100vh - 50px);
+            }
+
+            .sidebar-overlay {
+                top: 50px;
+                height: calc(100vh - 50px);
+            }
+
+            .section {
+                padding: 10px;
+            }
+
+            .deadline {
+                padding: 8px;
+            }
+
+            .countdown {
+                font-size: 14px;
+            }
+
+            .grade-subject .assessment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         FIXED HEADER
+    ========================== -->
+
+    <header class="header">
+
+        <div class="logo">
+            <div class="logo-main">
+                <div class="logo-icon">📚</div>
+                StudyPad
+            </div>
+            <div class="logo-sub">Joheliv: Jason's Labs</div>
+        </div>
+
+        <div class="header-actions">
+            <input class="search" type="text" placeholder="Search...">
+            <button class="notification" id="notifBtn">🔔</button>
+            <div class="profile">J</div>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+        </div>
+
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="menu-title">Workspace</div>
+
+        <button class="menu-item active" data-section="dashboard">
+            <span>🏠</span>
+            <span>Dashboard</span>
+        </button>
+
+        <button class="menu-item" data-section="timetable">
+            <span>📅</span>
+            <span>Timetable</span>
+        </button>
+
+        <button class="menu-item" data-section="notes">
+            <span>📝</span>
+            <span>Notes</span>
+        </button>
+
+        <button class="menu-item" data-section="assignments">
+            <span>✅</span>
+            <span>Assignments</span>
+        </button>
+
+        <button class="menu-item" data-section="calendar">
+            <span>📆</span>
+            <span>Calendar</span>
+        </button>
+
+        <button class="menu-item" data-section="stickies">
+            <span>📌</span>
+            <span>Sticky Notes</span>
+        </button>
+
+        <button class="menu-item" data-section="documents">
+            <span>📂</span>
+            <span>Documents</span>
+        </button>
+
+        <button class="menu-item" data-section="timer">
+            <span>⏱️</span>
+            <span>Study Timer</span>
+        </button>
+
+        <button class="menu-item" data-section="grades">
+            <span>📊</span>
+            <span>Grades</span>
+        </button>
+
+        <div class="menu-title">Account</div>
+
+        <button class="menu-item" data-section="settings">
+            <span>⚙️</span>
+            <span>Settings</span>
+        </button>
+
+    </aside>
+
+
+    <!-- =========================
+         SCROLLABLE MAIN CONTENT
+    ========================== -->
+
+    <main class="main" id="main">
+
+        <!-- DASHBOARD SECTION -->
+        <div id="section-dashboard" class="page-section active-section">
+
+            <div class="page-title">
+                <h1 id="greeting">Good afternoon 👋</h1>
+                <p>Here's what's happening with your studies.</p>
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="card-label">Total Assessments</div>
+                    <div class="card-value" id="totalAssessments">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Completed</div>
+                    <div class="card-value" id="completedAssessments">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Pending</div>
+                    <div class="card-value" id="pendingAssessments">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Study Hours</div>
+                    <div class="card-value">12.5h</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>🔥 Upcoming Assessments</h2>
+                        <button class="btn-action" id="showAssessmentForm">+ Add</button>
+                    </div>
+                    
+                    <div class="assessment-form" id="assessmentForm" style="display:none;">
+                        <h3 style="margin-bottom:8px; font-size:15px;">📝 Draft New Assessment</h3>
+                        <input type="text" id="assessmentName" placeholder="Assessment Name (e.g., Test 1)">
+                        <div class="form-row">
+                            <input type="date" id="assessmentDate">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-action" id="saveAssessment" style="flex:2;">💾 Save</button>
+                            <button class="btn-action" id="cancelAssessment" style="flex:1;">Cancel</button>
+                        </div>
+                        <div style="margin-top:6px; font-size:11px; color:#6b7280;">Max 10 assessments</div>
+                    </div>
+
+                    <div id="deadlinesContainer">
+                        <div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No upcoming assessments. Add one above.</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h2>📌 Sticky Notes</h2>
+                        <button class="btn-add-sticky" id="addStickyBtn">+</button>
+                    </div>
+                    <div class="sticky-grid" id="stickyGrid">
+                        <!-- Sticky notes will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== NOTES SECTION ===== -->
+        <div id="section-notes" class="page-section">
+            <div class="page-title"><h1>📝 Notes</h1><p>Upload and manage your notes. All notes are saved automatically.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📄 Your Notes</h2>
+                    <span style="font-size:13px; color:#6b7280;" id="noteCount">0 notes</span>
+                </div>
+                <div class="notes-list" id="notesList">
+                    <div style="color:#9ca3af; text-align:center; padding:16px;">No notes yet. Upload one below.</div>
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <p>📤 Click or drag & drop to upload notes</p>
+                    <p style="font-size:11px; margin-top:4px;">Supports .txt, .pdf, .docx</p>
+                    <input type="file" id="fileInput" multiple accept=".txt,.pdf,.docx">
+                </div>
+                <div style="margin-top:12px;">
+                    <button class="btn-action" id="draftNoteBtn">📝 Create Draft</button>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📑 Drafts</h2>
+                    <span style="font-size:13px; color:#6b7280;" id="draftCount">0 drafts</span>
+                </div>
+                <div class="notes-list" id="draftsList">
+                    <div style="color:#9ca3af; text-align:center; padding:16px;">No drafts yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ASSIGNMENTS SECTION ===== -->
+        <div id="section-assignments" class="page-section">
+            <div class="page-title"><h1>✅ Assignments</h1><p>Create and manage your assignments.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📋 All Assignments</h2>
+                    <button class="btn-action" id="showAssignmentForm">+ New</button>
+                </div>
+                
+                <div class="assignment-form" id="assignmentForm" style="display:none;">
+                    <h3 style="margin-bottom:8px; font-size:15px;">✏️ Create Assignment</h3>
+                    <input type="text" id="assignmentTitle" placeholder="Assignment Title">
+                    <textarea id="assignmentDesc" placeholder="Description / Instructions"></textarea>
+                    <input type="date" id="assignmentDue">
+                    <div class="form-actions">
+                        <button class="btn-action" id="saveAssignment" style="flex:2;">💾 Save</button>
+                        <button class="btn-action" id="cancelAssignment" style="flex:1;">Cancel</button>
+                    </div>
+                </div>
+
+                <div id="assignmentsContainer">
+                    <div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No assignments yet. Create one above.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CALENDAR SECTION ===== -->
+        <div id="section-calendar" class="page-section">
+            <div class="page-title"><h1>📆 Calendar</h1><p>South African Time (SAST)</p></div>
+            <div class="section">
+                <div class="calendar-header">
+                    <button id="prevMonth">◀</button>
+                    <h2 id="calendarMonthYear">January 2026</h2>
+                    <button id="nextMonth">▶</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+                <div style="margin-top:12px; text-align:center; color:#6b7280; font-size:13px;">
+                    🕒 SAST: <span id="sastTime">--:--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STUDY TIMER SECTION ===== -->
+        <div id="section-timer" class="page-section">
+            <div class="page-title"><h1>⏱️ Study Timer</h1><p>Stay focused with timed sessions. Runs in the background!</p></div>
+            <div class="section">
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-controls">
+                    <button class="start-btn" id="timerStart">▶ Start</button>
+                    <button class="pause-btn" id="timerPause">⏸ Pause</button>
+                    <button class="reset-btn" id="timerReset">⟲ Reset</button>
+                </div>
+                <div class="timer-status" id="timerStatus">⏳ Ready</div>
+                <div class="timer-alert" id="timerAlert">⏰ TIME'S UP! 🎯</div>
+                <div style="margin-top:12px; text-align:center;">
+                    <button class="btn-action" id="setCustomTimer">⏱ Set Custom Time</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STICKY NOTES FULL SECTION ===== -->
+        <div id="section-stickies" class="page-section">
+            <div class="page-title"><h1>📌 Sticky Notes</h1><p>Drag to rearrange, click title or text to edit. All changes are saved automatically.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>All Sticky Notes</h2>
+                    <button class="btn-add-sticky" id="addStickyFullBtn">+</button>
+                </div>
+                <div class="sticky-grid" id="stickyGridFull">
+                    <!-- Sticky notes will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DOCUMENTS SECTION ===== -->
+        <div id="section-documents" class="page-section">
+            <div class="page-title"><h1>📂 Documents</h1><p>All your uploaded documents in one place. Click to view.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📁 Uploaded Documents</h2>
+                    <button class="btn-action" id="showDocUpload">+ Upload</button>
+                </div>
+                
+                <div class="upload-area" id="docUploadArea" style="display:none;">
+                    <p>📤 Click or drag & drop to upload documents</p>
+                    <p style="font-size:11px; margin-top:4px;">Supports .pdf, .docx, .txt, .jpg, .png</p>
+                    <input type="file" id="docFileInput" multiple accept=".pdf,.docx,.txt,.jpg,.jpeg,.png">
+                </div>
+
+                <div id="documentsContainer">
+                    <div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No documents uploaded yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TIMETABLE SECTION ===== -->
+        <div id="section-timetable" class="page-section">
+            <div class="page-title"><h1>📅 Timetable</h1><p>Manage your weekly schedule.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📋 Weekly Schedule</h2>
+                    <button class="btn-action" id="addEventBtn">+ Add Event</button>
+                </div>
+                
+                <div class="timetable-grid" id="timetableGrid">
+                    <div class="time-slot">Time</div>
+                    <div class="time-slot">Event</div>
+                </div>
+                <div id="timetableContainer" style="margin-top:10px;">
+                    <div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No events scheduled. Add one above.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== GRADES SECTION ===== -->
+        <div id="section-grades" class="page-section">
+            <div class="page-title"><h1>📊 Grades</h1><p>Track your academic performance with automatic calculation.</p></div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>📈 Subjects & Assessments</h2>
+                    <button class="btn-action" id="addSubjectBtn">+ Add Subject</button>
+                </div>
+                
+                <div id="gradesContainer">
+                    <div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No subjects added yet. Click "Add Subject" to start.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SETTINGS SECTION ===== -->
+        <div id="section-settings" class="page-section">
+            <div class="page-title"><h1>⚙️ Settings</h1><p>Manage your account and preferences.</p></div>
+            <div class="section">
+                <div class="setting-group">
+                    <label>Profile Name</label>
+                    <input type="text" id="profileName" placeholder="Enter your name" value="Jason">
+                </div>
+                <div class="setting-group">
+                    <label>Email</label>
+                    <input type="email" id="profileEmail" placeholder="Enter your email" value="jason@studypad.com">
+                </div>
+                <div class="setting-group">
+                    <label>Theme</label>
+                    <select id="themeSelect">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="auto">System Default</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Notifications</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="notifToggle" checked>
+                        <label for="notifToggle" style="font-weight:400; font-size:13px;">Enable voice notifications</label>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <button class="btn-action" id="saveSettingsBtn">💾 Save Settings</button>
+                </div>
+                <div id="settingsMessage" style="color:#059669; margin-top:8px; display:none;">Settings saved successfully!</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =========================
+         DOCUMENT VIEWER MODAL
+    ========================== -->
+    <div class="doc-viewer-overlay" id="docViewerOverlay">
+        <div class="doc-viewer">
+            <div class="doc-viewer-header">
+                <h3 id="docViewerTitle">Document</h3>
+                <button class="close-viewer" id="docViewerClose">✕</button>
+            </div>
+            <div class="doc-viewer-body" id="docViewerBody">
+                <div class="doc-content" id="docViewerContent">
+                    <div class="preview-unavailable">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+
+            // ========================
+            // AUDIO CONTEXT FOR BEEP
+            // ========================
+            let audioContext = null;
+
+            function playBeep() {
+                try {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                    
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 600;
+                        osc2.type = 'sine';
+                        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        osc2.start(audioContext.currentTime);
+                        osc2.stop(audioContext.currentTime + 0.5);
+                    }, 200);
+                    
+                    setTimeout(() => {
+                        const osc3 = audioContext.createOscillator();
+                        const gain3 = audioContext.createGain();
+                        osc3.connect(gain3);
+                        gain3.connect(audioContext.destination);
+                        osc3.frequency.value = 1000;
+                        osc3.type = 'sine';
+                        gain3.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        osc3.start(audioContext.currentTime);
+                        osc3.stop(audioContext.currentTime + 0.5);
+                    }, 400);
+                    
+                } catch(e) {
+                    console.log('Audio play error:', e);
+                }
+            }
+
+            // ========================
+            // VOICE NOTIFICATION
+            // ========================
+            let voiceEnabled = true;
+
+            function speakMessage(message) {
+                if (!voiceEnabled) return;
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(message);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.1;
+                    utterance.volume = 1;
+                    
+                    const voices = speechSynthesis.getVoices();
+                    const femaleVoice = voices.find(v => 
+                        v.name.toLowerCase().includes('female') || 
+                        v.name.toLowerCase().includes('samantha') ||
+                        v.name.toLowerCase().includes('victoria') ||
+                        v.name.toLowerCase().includes('zira') ||
+                        v.name.toLowerCase().includes('google uk') ||
+                        v.name.toLowerCase().includes('siri')
+                    );
+                    if (femaleVoice) {
+                        utterance.voice = femaleVoice;
+                    }
+                    
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+
+            if ('speechSynthesis' in window) {
+                speechSynthesis.getVoices();
+                speechSynthesis.onvoiceschanged = () => {
+                    speechSynthesis.getVoices();
+                };
+            }
+
+            // ========================
+            // MOBILE SIDEBAR TOGGLE
+            // ========================
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+            const main = document.getElementById('main');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                main.classList.toggle('expanded');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                main.classList.remove('expanded');
+            }
+
+            menuToggle.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // ========================
+            // DYNAMIC GREETING (SAST)
+            // ========================
+            function updateGreeting() {
+                const now = new Date();
+                const sastTime = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Johannesburg' }));
+                const hour = sastTime.getHours();
+                let greeting = '';
+                
+                if (hour >= 5 && hour < 12) {
+                    greeting = 'Good morning 🌅';
+                } else if (hour >= 12 && hour < 17) {
+                    greeting = 'Good afternoon ☀️';
+                } else if (hour >= 17 && hour < 21) {
+                    greeting = 'Good evening 🌆';
+                } else {
+                    greeting = 'Good night 🌙';
+                }
+                
+                const greetingEl = document.getElementById('greeting');
+                if (greetingEl) {
+                    greetingEl.textContent = greeting + ' 👋';
+                }
+            }
+            
+            updateGreeting();
+            setInterval(updateGreeting, 60000);
+
+            // ========================
+            // SIDEBAR NAVIGATION
+            // ========================
+            const menuItems = document.querySelectorAll('.menu-item');
+            const sections = {
+                dashboard: document.getElementById('section-dashboard'),
+                timetable: document.getElementById('section-timetable'),
+                notes: document.getElementById('section-notes'),
+                assignments: document.getElementById('section-assignments'),
+                calendar: document.getElementById('section-calendar'),
+                stickies: document.getElementById('section-stickies'),
+                documents: document.getElementById('section-documents'),
+                timer: document.getElementById('section-timer'),
+                grades: document.getElementById('section-grades'),
+                settings: document.getElementById('section-settings')
+            };
+
+            function switchSection(sectionId) {
+                Object.values(sections).forEach(el => {
+                    if (el) el.classList.remove('active-section');
+                });
+                if (sections[sectionId]) {
+                    sections[sectionId].classList.add('active-section');
+                }
+                menuItems.forEach(item => item.classList.remove('active'));
+                const activeMenuItem = document.querySelector(`.menu-item[data-section="${sectionId}"]`);
+                if (activeMenuItem) activeMenuItem.classList.add('active');
+            }
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    const section = this.dataset.section;
+                    if (section) switchSection(section);
+                });
+            });
+
+            // ========================
+            // NOTIFICATION
+            // ========================
+            document.getElementById('notifBtn').addEventListener('click', () => {
+                alert('🔔 No new notifications right now.');
+            });
+
+            // ========================
+            // ASSESSMENTS SYSTEM
+            // ========================
+            let assessments = [];
+            let assessmentIdCounter = 0;
+            let countdownIntervals = {};
+            let alertedAssessments = new Set();
+
+            function loadAssessments() {
+                const saved = localStorage.getItem('assessments');
+                if (saved) {
+                    try {
+                        assessments = JSON.parse(saved);
+                        assessmentIdCounter = assessments.length > 0 ? Math.max(...assessments.map(a => a.id)) + 1 : 0;
+                    } catch(e) {
+                        assessments = [];
+                    }
+                }
+                renderAssessments();
+                updateStats();
+                checkDeadlineAlerts();
+            }
+
+            function saveAssessments() {
+                localStorage.setItem('assessments', JSON.stringify(assessments));
+            }
+
+            function checkDeadlineAlerts() {
+                const now = new Date();
+                assessments.forEach(assessment => {
+                    if (assessment.completed) return;
+                    const due = new Date(assessment.date);
+                    const diff = due - now;
+                    const hoursLeft = diff / (1000 * 60 * 60);
+                    
+                    if (hoursLeft <= 24 && hoursLeft > 0 && !alertedAssessments.has(assessment.id)) {
+                        alertedAssessments.add(assessment.id);
+                        playBeep();
+                        speakMessage(`Attention! Your assessment "${assessment.name}" is due in less than 24 hours. Please submit it soon.`);
+                    }
+                });
+            }
+
+            function renderAssessments() {
+                const container = document.getElementById('deadlinesContainer');
+                if (assessments.length === 0) {
+                    container.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No upcoming assessments. Add one above.</div>';
+                    return;
+                }
+
+                const sorted = [...assessments].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                container.innerHTML = sorted.map(assessment => {
+                    const isCompleted = assessment.completed || false;
+                    const dueDate = new Date(assessment.date);
+                    const now = new Date();
+                    const isPast = dueDate < now && !isCompleted;
+                    
+                    return `
+                        <div class="deadline" data-id="${assessment.id}">
+                            <div class="deadline-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <span>${assessment.name}</span>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                                    <span style="font-size:11px; color:#6b7280;">${assessment.date}</span>
+                                    ${!isCompleted ? `<button class="btn-action" style="padding:2px 8px; font-size:11px;" onclick="markComplete(${assessment.id})">✅ Done</button>` : '<span style="color:#059669; font-weight:bold; font-size:12px;">✅ Completed</span>'}
+                                    <button class="btn-action" style="padding:2px 8px; font-size:11px; background:#fee2e2;" onclick="deleteAssessment(${assessment.id})">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="countdown" id="countdown-${assessment.id}">
+                                ${isCompleted ? '🎉 Completed!' : isPast ? '⏰ Past Due' : 'Loading...'}
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: ${isCompleted ? 100 : isPast ? 100 : calculateProgress(assessment.date)}%; background: ${isCompleted ? '#059669' : isPast ? '#dc2626' : '#111827'};"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                assessments.forEach(assessment => {
+                    if (!assessment.completed) {
+                        startCountdown(assessment.id);
+                    }
+                });
+                updateStats();
+                checkDeadlineAlerts();
+            }
+
+            function calculateProgress(dateStr) {
+                const due = new Date(dateStr);
+                const now = new Date();
+                const created = new Date(due);
+                created.setDate(created.getDate() - 30);
+                
+                const total = due - created;
+                const elapsed = now - created;
+                
+                if (elapsed <= 0) return 5;
+                if (elapsed >= total) return 100;
+                return Math.min(100, Math.max(5, (elapsed / total) * 100));
+            }
+
+            function startCountdown(id) {
+                if (countdownIntervals[id]) {
+                    clearInterval(countdownIntervals[id]);
+                }
+                
+                const assessment = assessments.find(a => a.id === id);
+                if (!assessment || assessment.completed) return;
+
+                function updateCountdown() {
+                    const el = document.getElementById(`countdown-${id}`);
+                    if (!el) {
+                        if (countdownIntervals[id]) {
+                            clearInterval(countdownIntervals[id]);
+                            delete countdownIntervals[id];
+                        }
+                        return;
+                    }
+
+                    const now = new Date();
+                    const due = new Date(assessment.date);
+                    const diff = due - now;
+
+                    if (diff <= 0) {
+                        el.textContent = '⏰ Past Due';
+                        if (countdownIntervals[id]) {
+                            clearInterval(countdownIntervals[id]);
+                            delete countdownIntervals[id];
+                        }
+                        renderAssessments();
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    el.textContent = `${String(days).padStart(2, '0')} : ${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+                    
+                    const hoursLeft = diff / (1000 * 60 * 60);
+                    if (hoursLeft <= 24 && hoursLeft > 0 && !alertedAssessments.has(id)) {
+                        alertedAssessments.add(id);
+                        playBeep();
+                        speakMessage(`Attention! Your assessment "${assessment.name}" is due in less than 24 hours. Please submit it soon.`);
+                    }
+                }
+
+                updateCountdown();
+                countdownIntervals[id] = setInterval(updateCountdown, 1000);
+            }
+
+            window.markComplete = function(id) {
+                const assessment = assessments.find(a => a.id === id);
+                if (assessment) {
+                    assessment.completed = true;
+                    if (countdownIntervals[id]) {
+                        clearInterval(countdownIntervals[id]);
+                        delete countdownIntervals[id];
+                    }
+                    saveAssessments();
+                    renderAssessments();
+                    updateStats();
+                    playBeep();
+                    speakMessage(`Congratulations! You have completed "${assessment.name}".`);
+                }
+            };
+
+            window.deleteAssessment = function(id) {
+                if (confirm('Delete this assessment?')) {
+                    if (countdownIntervals[id]) {
+                        clearInterval(countdownIntervals[id]);
+                        delete countdownIntervals[id];
+                    }
+                    alertedAssessments.delete(id);
+                    assessments = assessments.filter(a => a.id !== id);
+                    saveAssessments();
+                    renderAssessments();
+                    updateStats();
+                }
+            };
+
+            function updateStats() {
+                const total = assessments.length;
+                const completed = assessments.filter(a => a.completed).length;
+                const pending = total - completed;
+                
+                document.getElementById('totalAssessments').textContent = total;
+                document.getElementById('completedAssessments').textContent = completed;
+                document.getElementById('pendingAssessments').textContent = pending;
+            }
+
+            const form = document.getElementById('assessmentForm');
+            const showFormBtn = document.getElementById('showAssessmentForm');
+            const cancelBtn = document.getElementById('cancelAssessment');
+
+            showFormBtn.addEventListener('click', () => {
+                if (assessments.length >= 10) {
+                    alert('Maximum 10 assessments allowed!');
+                    return;
+                }
+                form.style.display = 'block';
+                showFormBtn.textContent = 'Hide';
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                form.style.display = 'none';
+                showFormBtn.textContent = '+ Add';
+                document.getElementById('assessmentName').value = '';
+                document.getElementById('assessmentDate').value = '';
+            });
+
+            document.getElementById('saveAssessment').addEventListener('click', () => {
+                const name = document.getElementById('assessmentName').value.trim();
+                const date = document.getElementById('assessmentDate').value;
+
+                if (!name) {
+                    alert('Please enter an assessment name.');
+                    return;
+                }
+                if (!date) {
+                    alert('Please select a due date.');
+                    return;
+                }
+
+                if (assessments.length >= 10) {
+                    alert('Maximum 10 assessments allowed!');
+                    return;
+                }
+
+                const dueDate = new Date(date);
+                const now = new Date();
+                if (dueDate <= now) {
+                    alert('Please select a future date.');
+                    return;
+                }
+
+                const newAssessment = {
+                    id: assessmentIdCounter++,
+                    name: name,
+                    date: date,
+                    completed: false
+                };
+
+                assessments.push(newAssessment);
+                saveAssessments();
+                renderAssessments();
+                updateStats();
+
+                document.getElementById('assessmentName').value = '';
+                document.getElementById('assessmentDate').value = '';
+                form.style.display = 'none';
+                showFormBtn.textContent = '+ Add';
+
+                speakMessage(`Assessment "${name}" has been created and saved. Countdown activated.`);
+            });
+
+            // ========================
+            // ASSIGNMENTS PORTAL
+            // ========================
+            let assignmentsList = [];
+
+            function loadAssignments() {
+                const saved = localStorage.getItem('assignments');
+                if (saved) {
+                    try {
+                        assignmentsList = JSON.parse(saved);
+                    } catch(e) {
+                        assignmentsList = [];
+                    }
+                }
+                renderAssignments();
+            }
+
+            function saveAssignments() {
+                localStorage.setItem('assignments', JSON.stringify(assignmentsList));
+            }
+
+            function renderAssignments() {
+                const container = document.getElementById('assignmentsContainer');
+                if (assignmentsList.length === 0) {
+                    container.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No assignments yet. Create one above.</div>';
+                    return;
+                }
+
+                container.innerHTML = assignmentsList.map((assignment, index) => `
+                    <div class="assignment-card">
+                        <div class="assignment-title">${assignment.title}</div>
+                        <div class="assignment-desc">${assignment.description || 'No description'}</div>
+                        <div class="assignment-meta">📅 Due: ${assignment.due || 'No due date'} • Status: ${assignment.completed ? '✅ Completed' : '⏳ Pending'}</div>
+                        <div class="assignment-actions">
+                            ${!assignment.completed ? `<button class="btn-action" onclick="completeAssignment(${index})" style="padding:2px 10px; font-size:11px;">✅ Done</button>` : ''}
+                            <button class="btn-action" onclick="deleteAssignment(${index})" style="padding:2px 10px; font-size:11px; background:#fee2e2;">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            window.completeAssignment = function(index) {
+                assignmentsList[index].completed = true;
+                saveAssignments();
+                renderAssignments();
+                playBeep();
+                speakMessage(`Assignment "${assignmentsList[index].title}" marked as complete.`);
+            };
+
+            window.deleteAssignment = function(index) {
+                if (confirm('Delete this assignment?')) {
+                    assignmentsList.splice(index, 1);
+                    saveAssignments();
+                    renderAssignments();
+                }
+            };
+
+            const assignForm = document.getElementById('assignmentForm');
+            const showAssignBtn = document.getElementById('showAssignmentForm');
+            const cancelAssignBtn = document.getElementById('cancelAssignment');
+
+            showAssignBtn.addEventListener('click', () => {
+                assignForm.style.display = 'block';
+                showAssignBtn.textContent = 'Hide';
+            });
+
+            cancelAssignBtn.addEventListener('click', () => {
+                assignForm.style.display = 'none';
+                showAssignBtn.textContent = '+ New';
+                document.getElementById('assignmentTitle').value = '';
+                document.getElementById('assignmentDesc').value = '';
+                document.getElementById('assignmentDue').value = '';
+            });
+
+            document.getElementById('saveAssignment').addEventListener('click', () => {
+                const title = document.getElementById('assignmentTitle').value.trim();
+                const description = document.getElementById('assignmentDesc').value.trim();
+                const due = document.getElementById('assignmentDue').value;
+
+                if (!title) {
+                    alert('Please enter an assignment title.');
+                    return;
+                }
+
+                assignmentsList.push({
+                    title: title,
+                    description: description,
+                    due: due || 'No date set',
+                    completed: false
+                });
+
+                saveAssignments();
+                renderAssignments();
+
+                document.getElementById('assignmentTitle').value = '';
+                document.getElementById('assignmentDesc').value = '';
+                document.getElementById('assignmentDue').value = '';
+                assignForm.style.display = 'none';
+                showAssignBtn.textContent = '+ New';
+
+                speakMessage(`Assignment "${title}" has been created.`);
+            });
+
+            // ========================
+            // DOCUMENTS SECTION - FIXED WITH VIEWING
+            // ========================
+            let documents = [];
+
+            function loadDocuments() {
+                const saved = localStorage.getItem('documents');
+                if (saved) {
+                    try {
+                        documents = JSON.parse(saved);
+                    } catch(e) {
+                        documents = [];
+                    }
+                }
+                renderDocuments();
+            }
+
+            function saveDocuments() {
+                localStorage.setItem('documents', JSON.stringify(documents));
+            }
+
+            function getFileIcon(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                const icons = {
+                    'pdf': '📄',
+                    'docx': '📝',
+                    'doc': '📝',
+                    'txt': '📃',
+                    'jpg': '🖼️',
+                    'jpeg': '🖼️',
+                    'png': '🖼️',
+                    'gif': '🖼️',
+                    'svg': '🖼️',
+                    'xlsx': '📊',
+                    'xls': '📊',
+                    'pptx': '📊',
+                    'ppt': '📊',
+                    'zip': '📦',
+                    'rar': '📦',
+                };
+                return icons[ext] || '📎';
+            }
+
+            function getFileExtension(filename) {
+                return filename.split('.').pop().toLowerCase();
+            }
+
+            function isImageFile(filename) {
+                const ext = getFileExtension(filename);
+                return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext);
+            }
+
+            function isTextFile(filename) {
+                const ext = getFileExtension(filename);
+                return ['txt', 'csv', 'json', 'xml', 'html', 'css', 'js', 'md', 'log'].includes(ext);
+            }
+
+            function renderDocuments() {
+                const container = document.getElementById('documentsContainer');
+                if (documents.length === 0) {
+                    container.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No documents uploaded yet.</div>';
+                    return;
+                }
+
+                container.innerHTML = documents.map((doc, index) => `
+                    <div class="doc-item">
+                        <div class="doc-info" onclick="viewDocument(${index})">
+                            <span class="doc-icon">${getFileIcon(doc.name)}</span>
+                            <div>
+                                <div class="doc-name">${doc.name}</div>
+                                <div class="doc-meta">${doc.size} • ${doc.date}</div>
+                            </div>
+                        </div>
+                        <div class="doc-actions">
+                            <button class="view-btn" onclick="viewDocument(${index})" title="View document">👁️</button>
+                            <button class="delete-btn" onclick="deleteDocument(${index})" title="Delete document">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Document Viewer
+            const viewerOverlay = document.getElementById('docViewerOverlay');
+            const viewerTitle = document.getElementById('docViewerTitle');
+            const viewerContent = document.getElementById('docViewerContent');
+
+            window.viewDocument = function(index) {
+                const doc = documents[index];
+                if (!doc) return;
+
+                viewerTitle.textContent = doc.name;
+                viewerContent.innerHTML = '';
+
+                const ext = getFileExtension(doc.name);
+                const icon = getFileIcon(doc.name);
+
+                if (isImageFile(doc.name)) {
+                    // For images, try to display from base64
+                    if (doc.content) {
+                        viewerContent.innerHTML = `
+                            <div class="file-type-badge">${icon} <span class="ext">${ext.toUpperCase()}</span></div>
+                            <img src="${doc.content}" alt="${doc.name}" style="max-width:100%;">
+                        `;
+                    } else {
+                        viewerContent.innerHTML = `
+                            <div class="file-type-badge">${icon} <span class="ext">${ext.toUpperCase()}</span></div>
+                            <div class="preview-unavailable">
+                                <p style="font-size:48px; margin-bottom:16px;">🖼️</p>
+                                <p>Image preview not available</p>
+                                <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Download to view</p>
+                            </div>
+                        `;
+                    }
+                } else if (isTextFile(doc.name)) {
+                    // For text files, show content
+                    if (doc.content) {
+                        const textContent = doc.content;
+                        viewerContent.innerHTML = `
+                            <div class="file-type-badge">${icon} <span class="ext">${ext.toUpperCase()}</span></div>
+                            <div style="background:#f9fafb; padding:16px; border-radius:4px; font-family:monospace; font-size:14px; white-space:pre-wrap; word-wrap:break-word; max-height:500px; overflow:auto;">${textContent}</div>
+                        `;
+                    } else {
+                        viewerContent.innerHTML = `
+                            <div class="file-type-badge">${icon} <span class="ext">${ext.toUpperCase()}</span></div>
+                            <div class="preview-unavailable">
+                                <p style="font-size:48px; margin-bottom:16px;">📄</p>
+                                <p>Text preview not available</p>
+                                <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Download to view</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // For other files (PDF, DOCX, etc.)
+                    viewerContent.innerHTML = `
+                        <div class="file-type-badge">${icon} <span class="ext">${ext.toUpperCase()}</span></div>
+                        <div class="preview-unavailable">
+                            <p style="font-size:48px; margin-bottom:16px;">📄</p>
+                            <p>Preview not available for this file type</p>
+                            <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Download to view</p>
+                        </div>
+                    `;
+                }
+
+                viewerOverlay.classList.add('active');
+            };
+
+            document.getElementById('docViewerClose').addEventListener('click', () => {
+                viewerOverlay.classList.remove('active');
+            });
+
+            viewerOverlay.addEventListener('click', (e) => {
+                if (e.target === viewerOverlay) {
+                    viewerOverlay.classList.remove('active');
+                }
+            });
+
+            window.deleteDocument = function(index) {
+                if (confirm('Delete this document?')) {
+                    documents.splice(index, 1);
+                    saveDocuments();
+                    renderDocuments();
+                    speakMessage('Document deleted.');
+                }
+            };
+
+            const docUploadArea = document.getElementById('docUploadArea');
+            const docFileInput = document.getElementById('docFileInput');
+            const showDocBtn = document.getElementById('showDocUpload');
+
+            showDocBtn.addEventListener('click', () => {
+                if (docUploadArea.style.display === 'none') {
+                    docUploadArea.style.display = 'block';
+                    showDocBtn.textContent = 'Hide';
+                } else {
+                    docUploadArea.style.display = 'none';
+                    showDocBtn.textContent = '+ Upload';
+                }
+            });
+
+            docUploadArea.addEventListener('click', () => docFileInput.click());
+
+            docUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                docUploadArea.classList.add('dragover');
+            });
+
+            docUploadArea.addEventListener('dragleave', () => {
+                docUploadArea.classList.remove('dragover');
+            });
+
+            docUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                docUploadArea.classList.remove('dragover');
+                handleDocFiles(e.dataTransfer.files);
+            });
+
+            docFileInput.addEventListener('change', (e) => {
+                handleDocFiles(e.target.files);
+                docFileInput.value = '';
+            });
+
+            function handleDocFiles(files) {
+                for (let file of files) {
+                    const date = new Date().toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+                    
+                    // Read file content for text files and images
+                    const reader = new FileReader();
+                    const fileObj = {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        date: date,
+                        type: file.type
+                    };
+
+                    // For text files and images, store content for preview
+                    const ext = getFileExtension(file.name);
+                    if (isTextFile(file.name)) {
+                        reader.onload = function(e) {
+                            fileObj.content = e.target.result;
+                            documents.push(fileObj);
+                            saveDocuments();
+                            renderDocuments();
+                        };
+                        reader.readAsText(file);
+                    } else if (isImageFile(file.name)) {
+                        reader.onload = function(e) {
+                            fileObj.content = e.target.result;
+                            documents.push(fileObj);
+                            saveDocuments();
+                            renderDocuments();
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // For other files, just store metadata
+                        documents.push(fileObj);
+                        saveDocuments();
+                        renderDocuments();
+                    }
+                }
+                docUploadArea.style.display = 'none';
+                showDocBtn.textContent = '+ Upload';
+                speakMessage(`${files.length} document(s) uploaded successfully.`);
+            }
+
+            // ========================
+            // TIMETABLE
+            // ========================
+            let timetableEvents = [];
+
+            function loadTimetable() {
+                const saved = localStorage.getItem('timetable');
+                if (saved) {
+                    try {
+                        timetableEvents = JSON.parse(saved);
+                    } catch(e) {
+                        timetableEvents = [];
+                    }
+                }
+                renderTimetable();
+            }
+
+            function saveTimetable() {
+                localStorage.setItem('timetable', JSON.stringify(timetableEvents));
+            }
+
+            function renderTimetable() {
+                const container = document.getElementById('timetableContainer');
+                if (timetableEvents.length === 0) {
+                    container.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No events scheduled. Add one above.</div>';
+                    return;
+                }
+
+                container.innerHTML = timetableEvents.map((event, index) => `
+                    <div class="timetable-grid" style="border-bottom:1px solid #e5e7eb; padding:6px 0;">
+                        <div class="time-slot" style="border-bottom:none;">${event.time}</div>
+                        <div class="event-slot" style="border-bottom:none;">
+                            <div class="event-name">${event.name}</div>
+                            <div class="event-desc">${event.description || ''} 
+                                <button onclick="deleteTimetableEvent(${index})">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            window.deleteTimetableEvent = function(index) {
+                if (confirm('Delete this event?')) {
+                    timetableEvents.splice(index, 1);
+                    saveTimetable();
+                    renderTimetable();
+                }
+            };
+
+            document.getElementById('addEventBtn').addEventListener('click', () => {
+                const name = prompt('Enter event name:');
+                if (!name || !name.trim()) return;
+                const time = prompt('Enter time (e.g., 10:00 AM):');
+                if (!time || !time.trim()) return;
+                const description = prompt('Enter description (optional):');
+                
+                timetableEvents.push({
+                    name: name.trim(),
+                    time: time.trim(),
+                    description: description ? description.trim() : ''
+                });
+                saveTimetable();
+                renderTimetable();
+                speakMessage(`Event "${name.trim()}" added to timetable.`);
+            });
+
+            // ========================
+            // GRADES SYSTEM
+            // ========================
+            let subjects = [];
+
+            const ASSESSMENT_NAMES = ['Test 1', 'Test 2', 'Test 3', 'Test 4', 'Test 5', 'Exam'];
+
+            function loadGrades() {
+                const saved = localStorage.getItem('subjects');
+                if (saved) {
+                    try {
+                        subjects = JSON.parse(saved);
+                    } catch(e) {
+                        subjects = [];
+                    }
+                }
+                renderGrades();
+            }
+
+            function saveGrades() {
+                localStorage.setItem('subjects', JSON.stringify(subjects));
+            }
+
+            function calculateFinal(subject) {
+                let assessments = subject.assessments || [];
+                let total = 0;
+                let count = 0;
+                
+                assessments.forEach(a => {
+                    if (a.value !== '' && a.value !== null && !isNaN(a.value)) {
+                        total += parseFloat(a.value);
+                        count++;
+                    }
+                });
+                
+                if (count === 0) return null;
+                return Math.round((total / count) * 10) / 10;
+            }
+
+            function renderGrades() {
+                const container = document.getElementById('gradesContainer');
+                if (subjects.length === 0) {
+                    container.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px; font-size:14px;">No subjects added yet. Click "Add Subject" to start.</div>';
+                    return;
+                }
+
+                container.innerHTML = subjects.map((subject, subjectIndex) => {
+                    const finalMark = calculateFinal(subject);
+                    const assessments = subject.assessments || [];
+                    
+                    while (assessments.length < 6) {
+                        assessments.push({ name: ASSESSMENT_NAMES[assessments.length], value: '' });
+                    }
+                    
+                    return `
+                        <div class="grade-subject" data-index="${subjectIndex}">
+                            <div class="subject-header">
+                                <div>
+                                    <span class="subject-name">${subject.name}</span>
+                                    <span style="font-size:12px; color:#6b7280; margin-left:8px;">${assessments.filter(a => a.value !== '').length}/6 assessments</span>
+                                </div>
+                                <div>
+                                    <span class="subject-final ${finalMark !== null && finalMark >= 50 ? '' : 'fail'}">
+                                        ${finalMark !== null ? finalMark + '%' : 'No marks'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="assessment-grid">
+                                ${assessments.map((assessment, aIndex) => `
+                                    <div class="assessment-item">
+                                        <label>${assessment.name}</label>
+                                        <input type="number" 
+                                               min="0" 
+                                               max="100" 
+                                               placeholder="Score %" 
+                                               value="${assessment.value || ''}"
+                                               data-subject="${subjectIndex}"
+                                               data-assessment="${aIndex}"
+                                               class="assessment-input">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="subject-actions">
+                                <button class="btn-action" onclick="deleteSubject(${subjectIndex})" style="background:#fee2e2;">🗑️ Delete Subject</button>
+                                <button class="btn-action" onclick="resetSubject(${subjectIndex})">🔄 Reset All</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.assessment-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const subjectIndex = parseInt(this.dataset.subject);
+                        const assessmentIndex = parseInt(this.dataset.assessment);
+                        const value = this.value;
+                        
+                        if (subjects[subjectIndex] && subjects[subjectIndex].assessments) {
+                            subjects[subjectIndex].assessments[assessmentIndex].value = value;
+                            saveGrades();
+                            renderGrades();
+                        }
+                    });
+                });
+            }
+
+            window.deleteSubject = function(index) {
+                if (confirm(`Delete subject "${subjects[index].name}"?`)) {
+                    subjects.splice(index, 1);
+                    saveGrades();
+                    renderGrades();
+                    speakMessage(`Subject deleted.`);
+                }
+            };
+
+            window.resetSubject = function(index) {
+                if (confirm(`Reset all assessments for "${subjects[index].name}"?`)) {
+                    subjects[index].assessments = subjects[index].assessments.map(a => ({ ...a, value: '' }));
+                    saveGrades();
+                    renderGrades();
+                    speakMessage(`Assessments reset.`);
+                }
+            };
+
+            document.getElementById('addSubjectBtn').addEventListener('click', () => {
+                if (subjects.length >= 7) {
+                    alert('Maximum 7 subjects allowed!');
+                    return;
+                }
+                
+                const name = prompt('Enter subject name:');
+                if (!name || !name.trim()) return;
+                
+                const assessments = ASSESSMENT_NAMES.map(name => ({
+                    name: name,
+                    value: ''
+                }));
+                
+                subjects.push({
+                    name: name.trim(),
+                    assessments: assessments
+                });
+                
+                saveGrades();
+                renderGrades();
+                speakMessage(`Subject "${name.trim()}" added.`);
+            });
+
+            // ========================
+            // STICKY NOTES
+            // ========================
+            let stickyNotes = [];
+
+            function loadStickyNotes() {
+                const saved = localStorage.getItem('stickyNotes');
+                if (saved) {
+                    try {
+                        stickyNotes = JSON.parse(saved);
+                    } catch(e) {
+                        stickyNotes = [];
+                    }
+                }
+                renderAllStickies();
+            }
+
+            function saveStickyNotes() {
+                localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
+            }
+
+            function renderAllStickies() {
+                const grid1 = document.getElementById('stickyGrid');
+                if (grid1) {
+                    grid1.innerHTML = stickyNotes.map((note, index) => `
+                        <div class="sticky" data-index="${index}">
+                            <button class="delete-sticky" onclick="deleteSticky(${index})">✕</button>
+                            <h3 contenteditable="false">${note.title || 'New Note'}</h3>
+                            <p contenteditable="false">${note.content || 'Click to edit'}</p>
+                        </div>
+                    `).join('');
+                }
+
+                const grid2 = document.getElementById('stickyGridFull');
+                if (grid2) {
+                    grid2.innerHTML = stickyNotes.map((note, index) => `
+                        <div class="sticky" data-index="${index}">
+                            <button class="delete-sticky" onclick="deleteSticky(${index})">✕</button>
+                            <h3 contenteditable="false">${note.title || 'New Note'}</h3>
+                            <p contenteditable="false">${note.content || 'Click to edit'}</p>
+                        </div>
+                    `).join('');
+                }
+
+                initAllStickies();
+            }
+
+            function makeStickyInteractive(sticky) {
+                const index = sticky.dataset.index;
+                if (index === undefined) return;
+
+                const title = sticky.querySelector('h3');
+                const content = sticky.querySelector('p');
+
+                if (title) {
+                    title.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const current = this.textContent;
+                        const newText = prompt('Edit title:', current);
+                        if (newText !== null && newText.trim() !== '') {
+                            this.textContent = newText.trim();
+                            stickyNotes[index].title = newText.trim();
+                            saveStickyNotes();
+                            renderAllStickies();
+                        }
+                    });
+                }
+
+                if (content) {
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const current = this.textContent;
+                        const newText = prompt('Edit note content:', current);
+                        if (newText !== null && newText.trim() !== '') {
+                            this.textContent = newText.trim();
+                            stickyNotes[index].content = newText.trim();
+                            saveStickyNotes();
+                            renderAllStickies();
+                        }
+                    });
+                }
+
+                let isDragging = false;
+                let startX, startY, origX, origY;
+                
+                sticky.addEventListener('mousedown', function(e) {
+                    if (e.target.classList.contains('delete-sticky')) return;
+                    if (e.target.tagName === 'H3' || e.target.tagName === 'P') return;
+                    
+                    isDragging = true;
+                    const rect = sticky.getBoundingClientRect();
+                    const parentRect = sticky.parentElement.getBoundingClientRect();
+                    
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    origX = rect.left - parentRect.left;
+                    origY = rect.top - parentRect.top;
+                    
+                    sticky.classList.add('dragging');
+                    sticky.style.position = 'absolute';
+                    sticky.style.width = rect.width + 'px';
+                    sticky.style.zIndex = 9999;
+                    sticky.style.left = origX + 'px';
+                    sticky.style.top = origY + 'px';
+                    
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('mouseup', onDrop);
+                    e.preventDefault();
+                });
+
+                function onDrag(e) {
+                    if (!isDragging) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    sticky.style.left = (origX + dx) + 'px';
+                    sticky.style.top = (origY + dy) + 'px';
+                }
+
+                function onDrop(e) {
+                    if (isDragging) {
+                        isDragging = false;
+                        sticky.classList.remove('dragging');
+                        sticky.style.position = '';
+                        sticky.style.width = '';
+                        sticky.style.zIndex = '';
+                        sticky.style.left = '';
+                        sticky.style.top = '';
+                    }
+                    document.removeEventListener('mousemove', onDrag);
+                    document.removeEventListener('mouseup', onDrop);
+                }
+            }
+
+            window.deleteSticky = function(index) {
+                if (confirm('Delete this sticky note?')) {
+                    stickyNotes.splice(index, 1);
+                    saveStickyNotes();
+                    renderAllStickies();
+                    speakMessage('Sticky note deleted.');
+                }
+            };
+
+            function addStickyNote() {
+                stickyNotes.push({
+                    title: '📌 New Note',
+                    content: 'Click to edit this sticky note.'
+                });
+                saveStickyNotes();
+                renderAllStickies();
+                speakMessage('New sticky note added.');
+            }
+
+            document.getElementById('addStickyBtn').addEventListener('click', addStickyNote);
+            document.getElementById('addStickyFullBtn').addEventListener('click', addStickyNote);
+
+            function initAllStickies() {
+                document.querySelectorAll('.sticky').forEach(sticky => {
+                    makeStickyInteractive(sticky);
+                });
+            }
+
+            // ========================
+            // NOTES & UPLOAD / DRAFTS
+            // ========================
+            let notes = [];
+            let drafts = [];
+
+            function loadNotes() {
+                const saved = localStorage.getItem('notes');
+                if (saved) {
+                    try {
+                        notes = JSON.parse(saved);
+                    } catch(e) {
+                        notes = [];
+                    }
+                }
+                renderNotes();
+            }
+
+            function saveNotes() {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+
+            function loadDrafts() {
+                const saved = localStorage.getItem('drafts');
+                if (saved) {
+                    try {
+                        drafts = JSON.parse(saved);
+                    } catch(e) {
+                        drafts = [];
+                    }
+                }
+                renderDrafts();
+            }
+
+            function saveDrafts() {
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+            }
+
+            function renderNotes() {
+                const list = document.getElementById('notesList');
+                if (notes.length === 0) {
+                    list.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px;">No notes yet. Upload one below.</div>';
+                } else {
+                    list.innerHTML = notes.map((note, index) => `
+                        <div class="note-item">
+                            <div>
+                                <div class="note-title">${note.name}</div>
+                                <div class="note-meta">${note.size} • ${note.date}</div>
+                            </div>
+                            <div class="note-actions">
+                                <button onclick="deleteNote(${index})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('noteCount').textContent = `${notes.length} notes`;
+            }
+
+            function renderDrafts() {
+                const list = document.getElementById('draftsList');
+                if (drafts.length === 0) {
+                    list.innerHTML = '<div style="color:#9ca3af; text-align:center; padding:16px;">No drafts yet.</div>';
+                } else {
+                    list.innerHTML = drafts.map((draft, index) => `
+                        <div class="note-item">
+                            <div>
+                                <div class="note-title">${draft.title}</div>
+                                <div class="note-meta">${draft.date}</div>
+                            </div>
+                            <div class="note-actions">
+                                <button onclick="deleteDraft(${index})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('draftCount').textContent = `${drafts.length} drafts`;
+            }
+
+            window.deleteNote = function(index) {
+                notes.splice(index, 1);
+                saveNotes();
+                renderNotes();
+            };
+
+            window.deleteDraft = function(index) {
+                drafts.splice(index, 1);
+                saveDrafts();
+                renderDrafts();
+            };
+
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                fileInput.value = '';
+            });
+
+            function handleFiles(files) {
+                for (let file of files) {
+                    const date = new Date().toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+                    notes.push({
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        date: date
+                    });
+                }
+                saveNotes();
+                renderNotes();
+                speakMessage(`${files.length} note(s) uploaded successfully.`);
+            }
+
+            document.getElementById('draftNoteBtn').addEventListener('click', () => {
+                const title = prompt('Enter draft title:');
+                if (title && title.trim()) {
+                    const date = new Date().toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg' });
+                    drafts.push({
+                        title: title.trim(),
+                        date: date
+                    });
+                    saveDrafts();
+                    renderDrafts();
+                    speakMessage(`Draft "${title.trim()}" saved.`);
+                }
+            });
+
+            // ========================
+            // CALENDAR (SAST)
+            // ========================
+            let currentDate = new Date();
+
+            function renderCalendar(date) {
+                const grid = document.getElementById('calendarGrid');
+                const monthYear = document.getElementById('calendarMonthYear');
+                
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                
+                monthYear.textContent = date.toLocaleDateString('en-ZA', { month: 'long', year: 'numeric', timeZone: 'Africa/Johannesburg' });
+                
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const daysInPrevMonth = new Date(year, month, 0).getDate();
+                
+                const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                
+                let html = weekdays.map(day => `<div class="day weekday">${day}</div>`).join('');
+                
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const day = daysInPrevMonth - i;
+                    html += `<div class="day other-month">${day}</div>`;
+                }
+                
+                const todayDate = new Date().getDate();
+                const todayMonth = new Date().getMonth();
+                const todayYear = new Date().getFullYear();
+                
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const isToday = (i === todayDate && month === todayMonth && year === todayYear);
+                    html += `<div class="day ${isToday ? 'today' : ''}">${i}</div>`;
+                }
+                
+                const totalCells = firstDay + daysInMonth;
+                const remaining = (7 - (totalCells % 7)) % 7;
+                for (let i = 1; i <= remaining; i++) {
+                    html += `<div class="day other-month">${i}</div>`;
+                }
+                
+                grid.innerHTML = html;
+            }
+
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar(currentDate);
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar(currentDate);
+            });
+
+            function updateSASTTime() {
+                const now = new Date();
+                const sastTime = now.toLocaleTimeString('en-ZA', { timeZone: 'Africa/Johannesburg', hour12: false });
+                document.getElementById('sastTime').textContent = sastTime;
+            }
+            setInterval(updateSASTTime, 1000);
+            updateSASTTime();
+
+            renderCalendar(currentDate);
+
+            // ========================
+            // STUDY TIMER
+            // ========================
+            let timerSeconds = 1500;
+            let timerInterval = null;
+            let isRunning = false;
+            let isPaused = false;
+            let timerAlertShown = false;
+            let timerStartTime = null;
+            let timerRemaining = 1500;
+            
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerStatus = document.getElementById('timerStatus');
+            const timerAlert = document.getElementById('timerAlert');
+
+            function updateTimerDisplay() {
+                const mins = Math.floor(timerSeconds / 60);
+                const secs = timerSeconds % 60;
+                timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+
+            function triggerTimerAlert() {
+                if (timerAlertShown) return;
+                timerAlertShown = true;
+                
+                timerAlert.style.display = 'block';
+                
+                playBeep();
+                setTimeout(playBeep, 500);
+                setTimeout(playBeep, 1000);
+                setTimeout(playBeep, 1500);
+                
+                speakMessage("Time is up! Great job on your study session. Take a break now.");
+                
+                setTimeout(() => {
+                    timerAlert.style.display = 'none';
+                }, 8000);
+            }
+
+            function startTimer() {
+                if (isRunning && !isPaused) return;
+                
+                if (timerSeconds <= 0) {
+                    timerSeconds = 1500;
+                    timerRemaining = 1500;
+                    timerAlertShown = false;
+                    timerAlert.style.display = 'none';
+                    updateTimerDisplay();
+                }
+                
+                isRunning = true;
+                isPaused = false;
+                timerStartTime = Date.now();
+                timerRemaining = timerSeconds;
+                timerStatus.textContent = '⏳ Running...';
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                
+                timerInterval = setInterval(function() {
+                    if (!isRunning || isPaused) return;
+                    
+                    const now = Date.now();
+                    const elapsed = Math.floor((now - timerStartTime) / 1000);
+                    const newSeconds = timerRemaining - elapsed;
+                    
+                    if (newSeconds <= 0) {
+                        timerSeconds = 0;
+                        updateTimerDisplay();
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        isRunning = false;
+                        timerStatus.textContent = '⏰ Time\'s up!';
+                        triggerTimerAlert();
+                        timerRemaining = 1500;
+                        return;
+                    }
+                    
+                    timerSeconds = newSeconds;
+                    updateTimerDisplay();
+                }, 500);
+            }
+
+            function pauseTimer() {
+                if (!isRunning || isPaused) return;
+                
+                isPaused = true;
+                timerStatus.textContent = '⏸ Paused';
+                timerRemaining = timerSeconds;
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            }
+
+            function resumeTimer() {
+                if (!isRunning || !isPaused) return;
+                
+                isPaused = false;
+                timerStartTime = Date.now();
+                timerStatus.textContent = '⏳ Running...';
+                
+                timerInterval = setInterval(function() {
+                    if (!isRunning || isPaused) return;
+                    
+                    const now = Date.now();
+                    const elapsed = Math.floor((now - timerStartTime) / 1000);
+                    const newSeconds = timerRemaining - elapsed;
+                    
+                    if (newSeconds <= 0) {
+                        timerSeconds = 0;
+                        updateTimerDisplay();
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        isRunning = false;
+                        timerStatus.textContent = '⏰ Time\'s up!';
+                        triggerTimerAlert();
+                        timerRemaining = 1500;
+                        return;
+                    }
+                    
+                    timerSeconds = newSeconds;
+                    updateTimerDisplay();
+                }, 500);
+            }
+
+            function resetTimer() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                timerSeconds = 1500;
+                timerRemaining = 1500;
+                isRunning = false;
+                isPaused = false;
+                timerAlertShown = false;
+                timerAlert.style.display = 'none';
+                updateTimerDisplay();
+                timerStatus.textContent = '⏳ Ready';
+                timerStartTime = null;
+            }
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && isRunning && !isPaused) {
+                    updateTimerDisplay();
+                }
+            });
+
+            document.getElementById('timerStart').addEventListener('click', function() {
+                if (isPaused) {
+                    resumeTimer();
+                } else {
+                    startTimer();
+                }
+            });
+            
+            document.getElementById('timerPause').addEventListener('click', pauseTimer);
+            document.getElementById('timerReset').addEventListener('click', resetTimer);
+
+            document.getElementById('setCustomTimer').addEventListener('click', () => {
+                const mins = prompt('Enter custom time in minutes:', '25');
+                if (mins !== null && !isNaN(mins) && mins > 0) {
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+                    timerSeconds = parseInt(mins) * 60;
+                    timerRemaining = timerSeconds;
+                    isRunning = false;
+                    isPaused = false;
+                    timerAlertShown = false;
+                    timerAlert.style.display = 'none';
+                    updateTimerDisplay();
+                    timerStatus.textContent = `⏳ ${mins} min set`;
+                }
+            });
+
+            // ========================
+            // SETTINGS
+            // ========================
+            function loadSettings() {
+                const saved = localStorage.getItem('settings');
+                if (saved) {
+                    try {
+                        const settings = JSON.parse(saved);
+                        document.getElementById('profileName').value = settings.name || 'Jason';
+                        document.getElementById('profileEmail').value = settings.email || 'jason@studypad.com';
+                        document.getElementById('themeSelect').value = settings.theme || 'light';
+                        document.getElementById('notifToggle').checked = settings.notifications !== false;
+                        voiceEnabled = settings.notifications !== false;
+                    } catch(e) {}
+                }
+            }
+
+            document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+                const settings = {
+                    name: document.getElementById('profileName').value.trim(),
+                    email: document.getElementById('profileEmail').value.trim(),
+                    theme: document.getElementById('themeSelect').value,
+                    notifications: document.getElementById('notifToggle').checked
+                };
+                voiceEnabled = settings.notifications;
+                localStorage.setItem('settings', JSON.stringify(settings));
+                
+                const msg = document.getElementById('settingsMessage');
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 3000);
+                speakMessage('Settings saved successfully.');
+            });
+
+            // ========================
+            // INITIALIZATION
+            // ========================
+            loadAssessments();
+            loadAssignments();
+            loadDocuments();
+            loadTimetable();
+            loadGrades();
+            loadSettings();
+            loadStickyNotes();
+            loadNotes();
+            loadDrafts();
+            
+            const observer = new MutationObserver(function() {
+                initAllStickies();
+            });
+            
+            document.querySelectorAll('.sticky-grid').forEach(grid => {
+                observer.observe(grid, { childList: true, subtree: true });
+            });
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+
+            setInterval(() => {
+                checkDeadlineAlerts();
+            }, 60000);
+
+            document.addEventListener('click', function initAudio() {
+                if (!audioContext) {
+                    try {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    } catch(e) {}
+                }
+            }, { once: true });
+
+            switchSection('dashboard');
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && isRunning && !isPaused) {
+                    updateTimerDisplay();
+                }
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
