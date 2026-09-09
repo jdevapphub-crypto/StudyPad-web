@@ -1,2 +1,2 @@
 # StudyPad-web
-Plan, Learn. organise. Succeed.
+Plan, Learn. organize. Succeed.
