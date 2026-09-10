@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyPad - AI Humanizer & Paraphraser</title>
+<title>StudyPad - AI Humanizer</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
 body{background:#0a0a0f;color:#fff;min-height:100vh}
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#11111a;border-bottom:1px solid #222}
 .logo{font-weight:800;font-size:18px}.logo span{color:#7c5cfc}
-.nav a{color:#aaa;text-decoration:none;margin-left:18px;font-size:14px}.nav a.active{color:#fff}
+.nav{display:flex;gap:10px;align-items:center}
+.nav a{color:#aaa;text-decoration:none;margin-left:10px;font-size:14px;padding:8px 14px;border-radius:8px}
+.nav a.active{color:#fff;background:#1a1a26}
+.nav-back{background:#1a1a26!important;border:1px solid #2a2a35;color:#fff!important}
+.nav-back:hover{background:#2a2a3a!important}
 .container{max-width:1100px;margin:0 auto;padding:30px 20px}
 h1{font-size:32px;margin-bottom:8px}h1 span{color:#7c5cfc}
 .credit{opacity:0.4;font-size:13px;color:#888;margin-bottom:20px}
@@ -29,7 +33,7 @@ textarea:focus{border-color:#7c5cfc}
 </style>
 </head>
 <body>
-<div class="topbar"><div class="logo">📚 StudyPad <span>AI</span></div><div class="nav"><a href="#" class="active">Paraphraser</a></div></div>
+<div class="topbar"><div class="logo">📚 StudyPad <span>AI</span></div><div class="nav"><a href="index.html" class="nav-back">← Back to StudyPad</a><a href="#" class="active">Paraphraser</a></div></div>
 <div class="container">
 <h1>AI <span>Humanizer</span> & Paraphraser</h1>
 <p class="credit">Joheliv: Jason's Labs</p>
