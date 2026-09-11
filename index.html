@@ -1931,6 +1931,7 @@
                 dashboard: document.getElementById('section-dashboard'),
                 timetable: document.getElementById('section-timetable'),
                 notes: document.getElementById('section-notes'),
+                humanizer: document.getElementById('section-humanizer'),
                 assignments: document.getElementById('section-assignments'),
                 calendar: document.getElementById('section-calendar'),
                 stickies: document.getElementById('section-stickies'),
@@ -2641,7 +2642,7 @@
             // ========================
             let subjects = [];
 
-            const ASSESSMENT_NAMES = ['Test 1', 'Test 2', 'Test 3', 'Test 4', 'Test 5', 'Exam'];
+            const ASSESSMENT_NAMES = ['Assessment 1', 'Assessment 2', 'Assessment 3', 'Assessment 4', 'Assessment 5', 'Assessment 6'];
 
             function loadGrades() {
                 const saved = localStorage.getItem('subjects');
@@ -3340,8 +3341,8 @@
                 if (saved) {
                     try {
                         const settings = JSON.parse(saved);
-                        document.getElementById('profileName').value = settings.name || 'Jason';
-                        document.getElementById('profileEmail').value = settings.email || 'jason@studypad.com';
+                        document.getElementById('profileName').value = settings.name || 'your @name';
+                        document.getElementById('profileEmail').value = settings.email || 'emailaddress@studypad.com';
                         document.getElementById('themeSelect').value = settings.theme || 'light';
                         document.getElementById('notifToggle').checked = settings.notifications !== false;
                         voiceEnabled = settings.notifications !== false;
