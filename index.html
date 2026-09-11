@@ -4,6 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>StudyPad</title>
+    <!-- ═══════════ BLOCK C — localStorage shim ═══════════ -->
+<script>
+if (typeof window.storage === 'undefined') {
+  window.storage = {
+    async set(key, value) {
+      try { localStorage.setItem(key, value); return true; }
+      catch (e) { console.warn('storage.set failed:', e); return false; }
+    },
+    async get(key) {
+      const value = localStorage.getItem(key);
+      return value !== null ? { value } : null;
+    },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k.startsWith(prefix)) keys.push(k);
+      }
+      return { keys };
+    },
+    async delete(key) {
+      localStorage.removeItem(key);
+      return true;
+    }
+  };
+}
+</script>
+<!-- ═══════════ END BLOCK C ═══════════ -->
+    
     <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1e3c">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1671,7 +1700,35 @@
                     <h2>📁 Uploaded Documents</h2>
                     <button class="btn-action" id="showDocUpload">+ Upload</button>
                 </div>
+
+                        <!-- ═══════════ SMART READER ═══════════ -->
+        <div id="smartReaderLauncher" style="margin-bottom:16px; padding:16px; border-radius:12px; background:linear-gradient(135deg,#4f46e5,#7c5cfc); color:white; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div>
+                <div style="font-weight:700; font-size:15px;">🧠 Smart Reader</div>
+                <div style="font-size:12px; opacity:.9; margin-top:2px;">Upload a PDF → get an AI brief + quiz for any page</div>
+            </div>
+            <button id="openSmartReader"
+                    style="background:white; color:#4f46e5; padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:13px; cursor:pointer;">
+                🚀 Open Smart Reader
+            </button>
+        </div>
+
+        <!-- Embedded Smart Reader (hidden by default) -->
+        <div id="smartReaderEmbed" style="display:none; margin-bottom:16px; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:#0f172a; color:white;">
+                <span style="font-weight:700; font-size:13px;">🧠 Smart Reader</span>
+                <button id="closeSmartReader"
+                        style="background:rgba(255,255,255,.15); color:white; border:none; padding:5px 12px; border-radius:6px; font-size:12px; cursor:pointer;">
+                    ✕ Close
+                </button>
+            </div>
+            <iframe id="smartReaderFrame"
+                    src="about:blank"
+                    style="width:100%; height:750px; border:none; display:block;"
+                    title="StudyPad Smart Reader"></iframe>
+        </div>
                 
+        <!-- ═══════════ END SMART READER ═══════════ -->
                 <div class="upload-area" id="docUploadArea" style="display:none;">
                     <p>📤 Click or drag & drop to upload documents</p>
                     <p style="font-size:11px; margin-top:4px;">Supports .pdf, .docx, .txt, .jpg, .png</p>
@@ -3371,6 +3428,39 @@
                 setTimeout(() => { msg.style.display = 'none'; }, 3000);
                 speakMessage('Settings saved successfully.');
             });
+            
+            // ========================
+            // SMART READER EMBED
+            // ========================
+            const smartReaderEmbed = document.getElementById('smartReaderEmbed');
+            const smartReaderFrame = document.getElementById('smartReaderFrame');
+            const smartReaderLauncher = document.getElementById('smartReaderLauncher');
+            const openSmartReaderBtn = document.getElementById('openSmartReader');
+            const closeSmartReaderBtn = document.getElementById('closeSmartReader');
+
+            if (openSmartReaderBtn) {
+                openSmartReaderBtn.addEventListener('click', () => {
+                    // Load the iframe only the first time (saves memory)
+                    if (!smartReaderFrame.src || smartReaderFrame.src === 'about:blank') {
+                        smartReaderFrame.src = 'studypad-doc-smart.html';
+                    }
+                    smartReaderEmbed.style.display = 'block';
+                    smartReaderLauncher.style.display = 'none';
+                    // Smooth scroll into view
+                    setTimeout(() => {
+                        smartReaderEmbed.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 50);
+                });
+            }
+
+            if (closeSmartReaderBtn) {
+                closeSmartReaderBtn.addEventListener('click', () => {
+                    smartReaderEmbed.style.display = 'none';
+                    smartReaderLauncher.style.display = 'flex';
+                    // Unload the iframe so the next open is fresh
+                    smartReaderFrame.src = 'about:blank';
+                });
+            }
 
             // ========================
             // INITIALIZATION
